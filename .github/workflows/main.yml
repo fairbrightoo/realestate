@@ -7,6 +7,21 @@ jobs:
   deploy:
     name: 🎉 Deploy
     runs-on: ubuntu-latest
+    
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: laravel_test_db
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
     steps:
       - name: 🚚 Get latest code
         uses: actions/checkout@v2
@@ -29,6 +44,24 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
       
+      - name: Wait for MySQL to be ready
+        run: |
+          dockerize -wait tcp://localhost:3306 -timeout 1m
+
+      - name: Create test database
+        run: |
+          mysql -u root -proot -e "CREATE DATABASE IF NOT EXISTS laravel_test_db;"
+          
+      - name: Run migrations
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: laravel_test_db
+          DB_USERNAME: root
+          DB_PASSWORD: root
+        run: php artisan migrate --seed
+
       - name: Copy .env
         run: php -r "file_exists('.env') || copy('.env.example', '.env');"
       

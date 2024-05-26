@@ -43,10 +43,6 @@ jobs:
             ${{ runner.os }}-php-
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
-      
-      - name: Wait for MySQL to be ready
-        run: |
-          dockerize -wait tcp://localhost:3306 -timeout 1m
 
       - name: Create test database
         run: |

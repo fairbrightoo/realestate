@@ -26,6 +26,15 @@ jobs:
             ${{ runner.os }}-php-
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
+      
+      - name: Generate key
+        run: php artisan key:generate
+      
+      - name: Generate storage link
+        run: php artisan storage:link
+
+      - name: Directory Pernmissions
+        run: chmod -R 777 storage bootstrap/cache
 
       - name: 📂 Sync files
         uses: SamKirkland/FTP-Deploy-Action@master
@@ -33,4 +42,4 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: /public_html/staging/public_html/staging/public/
+          server-dir: /

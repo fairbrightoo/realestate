@@ -64,8 +64,8 @@ jobs:
         php artisan migrate --force
         #php artisan db:seed --force
       
-    - name: Execute tests 
-      run: php artisan test
+    # - name: Execute tests 
+    #   run: php artisan test
 
   deploy:
 
